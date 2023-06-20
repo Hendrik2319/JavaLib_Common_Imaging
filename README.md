@@ -1,6 +1,6 @@
 # JavaLib_Common_Imaging
 The `JavaLib_Common_*` libraries contains all code snippets, classes and concepts, I want to reuse over more than one project.  
-In `JavaLib_Common_Imaging` contains classes for:
+`JavaLib_Common_Imaging` contains classes for:
 * image handling (caching or computing similarities)
 * an image reader with transparent hashing support
 * an image renderer based on bumpmapping
