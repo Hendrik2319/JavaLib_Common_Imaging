@@ -1,10 +1,8 @@
-package net.schwarzbaer.java.lib.image.alphachar;
+package net.schwarzbaer.java.lib.image.linegeometry;
 
 import java.awt.geom.Point2D;
 import java.util.Locale;
 import java.util.Vector;
-
-import net.schwarzbaer.java.lib.image.alphachar.Form.PolyLine.Point;
 
 public interface Form {
 	
@@ -85,8 +83,8 @@ public interface Form {
 			return this;
 		}
 		
-		public Point computePoint(double f) {
-			return new Point( x1*(1-f)+x2*f, y1*(1-f)+y2*f );
+		public PolyLine.Point computePoint(double f) {
+			return new PolyLine.Point( x1*(1-f)+x2*f, y1*(1-f)+y2*f );
 		}
 		public LineDistance getDistance(double x, double y) {
 			return new LineDistance(x,y);

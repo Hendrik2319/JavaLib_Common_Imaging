@@ -1,4 +1,4 @@
-package net.schwarzbaer.java.lib.image.alphachar;
+package net.schwarzbaer.java.lib.image.linegeometry;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -73,12 +72,7 @@ public class AlphaCharIO {
 
 	public static HashMap<Character, Form[]> readAlphaCharFontFromStream(InputStream stream, Form.Factory formFactory) {
 		HashMap<Character, Form[]> alphabet = new HashMap<Character,Form[]>();
-		if (formFactory==null)
-			formFactory = new Form.Factory() {
-				@Override public Form.PolyLine createPolyLine(double[] values) { return new Form.PolyLine().setValues(values); }
-				@Override public Form.Line     createLine    (double[] values) { return new Form.Line    ().setValues(values); }
-				@Override public Form.Arc      createArc     (double[] values) { return new Form.Arc     ().setValues(values); }
-			};
+		LinesIO linesIO = new LinesIO(formFactory);
 		
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 			
@@ -88,45 +82,28 @@ public class AlphaCharIO {
 			
 			while ( (line=in.readLine())!=null ) {
 				if ( (value=getValue(line,"[AlphaChar '","']"))!=null ) {
-					addTo(alphabet,ch,forms);
+					addTo(alphabet,ch,forms); // if there was no empty line at end of previous block
 					Assert(value.length()==1);
 					ch = value.charAt(0);
 				}
-				if ( (value=getValue(line,"PolyLine="))!=null ) forms.add(formFactory.createPolyLine(toArray(value)));
-				if ( (value=getValue(line,"Line="    ))!=null ) forms.add(formFactory.createLine    (toArray(value)));
-				if ( (value=getValue(line,"Arc="     ))!=null ) forms.add(formFactory.createArc     (toArray(value)));
+				linesIO.parseFormLine(line, forms::add);
 				if (line.isEmpty()) { addTo(alphabet,ch,forms); ch = null; }
 			}
-			addTo(alphabet,ch,forms);
+			addTo(alphabet,ch,forms); // if there was no empty line at end of last block
 			
 		}
 		catch (IOException e) { e.printStackTrace(); }
 		
 		return alphabet;
 	}
-	
-	private static double[] toArray(String str) {
-		String[] valueStrs = str.split(";");
-		double[] values = new double[valueStrs.length];
-		for (int i=0; i<values.length; i++) {
-			try { values[i] = Double.parseDouble(valueStrs[i]); }
-			catch (NumberFormatException e) { values[i] = Double.NaN; }
-			if (Double.isNaN(values[i])) {
-				System.err.printf("Can't parse Double value (\"%s\") in String \"%s\" at position %d.%n", valueStrs[i], str, i);
-				return null;
-			}
-		}
-		return values;
-	}
 
 	private static void addTo(HashMap<Character, Form[]> alphabet, Character ch, Vector<Form> forms) {
 		if (ch!=null && forms!=null && !forms.isEmpty()) {
-			alphabet.put(ch, forms.toArray(new Form[forms.size()]));
+			alphabet.put(ch, forms.toArray(Form[]::new));
 			forms.clear();
 		}
 	}
 
-	private static String getValue(String line, String prefix) { return getValue(line, prefix, null); }
 	private static String getValue(String line, String prefix, String suffix) {
 		if (prefix!=null) { if (line.startsWith(prefix)) line = line.substring(prefix.length()                ); else return null; }
 		if (suffix!=null) { if (line.endsWith  (suffix)) line = line.substring(0,line.length()-suffix.length()); else return null; }
@@ -143,7 +120,7 @@ public class AlphaCharIO {
 			for (Character ch:keys) {
 				out.printf("[AlphaChar '%s']%n", ch);
 				Form[] forms = alphabet.get(ch);
-				writeForms(out,forms);
+				LinesIO.writeForms(out,forms);
 				out.printf("%n");
 			}
 			
@@ -152,14 +129,5 @@ public class AlphaCharIO {
 		}
 		
 		if (verbose) System.out.printf("... done%n");
-	}
-
-	private static void writeForms(PrintWriter out, Form[] forms) {
-		for (Form form:forms) {
-			double[] values = form.getValues();
-			String name = form.getClass().getSimpleName();
-			String valuesStr = String.join(";", Arrays.stream(values).mapToObj(d->Double.toString(d)).toArray(String[]::new));
-			out.printf("%s=%s%n", name, valuesStr);
-		}
 	}
 }

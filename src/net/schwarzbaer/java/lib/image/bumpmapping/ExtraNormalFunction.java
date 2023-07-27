@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.function.BiFunction;
 
-import net.schwarzbaer.java.lib.image.alphachar.Form;
 import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.Filter;
 import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.Normal;
 import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.NormalFunctionBase;
 import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.NormalXY;
 import net.schwarzbaer.java.lib.image.bumpmapping.ExtraNormalFunction.Cart.AlphaChar.XRange;
+import net.schwarzbaer.java.lib.image.linegeometry.Form;
 
 public interface ExtraNormalFunction extends NormalFunctionBase {
 
