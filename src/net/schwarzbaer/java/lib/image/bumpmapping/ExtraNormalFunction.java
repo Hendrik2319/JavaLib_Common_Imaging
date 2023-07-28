@@ -10,6 +10,7 @@ import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.NormalFunctionBase
 import net.schwarzbaer.java.lib.image.bumpmapping.BumpMapping.NormalXY;
 import net.schwarzbaer.java.lib.image.bumpmapping.ExtraNormalFunction.Cart.AlphaChar.XRange;
 import net.schwarzbaer.java.lib.image.linegeometry.Form;
+import net.schwarzbaer.java.lib.image.linegeometry.Math2;
 
 public interface ExtraNormalFunction extends NormalFunctionBase {
 
@@ -305,10 +306,10 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 					BoundingRectangle tempBounds = new BoundingRectangle(xMin, yMin, xMax, yMax);
 					
 					double R = this.r+this.profile.maxR;
-					if (BumpMapping.isInsideAngleRange(this.aStart,this.aEnd,       0  )) tempBounds = tempBounds.add(this.xC+R,this.yC  );
-					if (BumpMapping.isInsideAngleRange(this.aStart,this.aEnd, Math.PI  )) tempBounds = tempBounds.add(this.xC-R,this.yC  );
-					if (BumpMapping.isInsideAngleRange(this.aStart,this.aEnd, Math.PI/2)) tempBounds = tempBounds.add(this.xC  ,this.yC+R);
-					if (BumpMapping.isInsideAngleRange(this.aStart,this.aEnd,-Math.PI/2)) tempBounds = tempBounds.add(this.xC  ,this.yC-R);
+					if (Math2.isInsideAngleRange(this.aStart, this.aEnd,  0.0      )) tempBounds = tempBounds.add(this.xC+R,this.yC  );
+					if (Math2.isInsideAngleRange(this.aStart, this.aEnd,  Math.PI  )) tempBounds = tempBounds.add(this.xC-R,this.yC  );
+					if (Math2.isInsideAngleRange(this.aStart, this.aEnd,  Math.PI/2)) tempBounds = tempBounds.add(this.xC  ,this.yC+R);
+					if (Math2.isInsideAngleRange(this.aStart, this.aEnd, -Math.PI/2)) tempBounds = tempBounds.add(this.xC  ,this.yC-R);
 					
 					bounds = tempBounds;
 				}
@@ -320,7 +321,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 					Distance dC = Distance.compute(xC,yC,x,y);
 					if (Math.abs(dC.r-r)>profile.maxR) return null;
 					
-					if (BumpMapping.isInsideAngleRange(aStart, aEnd, dC.w)) {
+					if (Math2.isInsideAngleRange(aStart, aEnd, dC.w)) {
 						if (dC.r>r) return new Distance(dC.r-r, dC.w);
 						return             new Distance(r-dC.r, dC.w+Math.PI);
 					}
@@ -339,7 +340,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 					if (!bounds.isInside(x,y)) return false;
 					Distance dC = Distance.compute(xC,yC,x,y);
 					if (Math.abs(dC.r-r)>profile.maxR) return false;
-					if (BumpMapping.isInsideAngleRange(aStart, aEnd, dC.w)) return true;
+					if (Math2.isInsideAngleRange(aStart, aEnd, dC.w)) return true;
 					return Distance.computeR(xS,yS,x,y)<=profile.maxR || Distance.computeR(xE,yE,x,y)<=profile.maxR;
 				}
 			}
@@ -654,8 +655,8 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 					double x1 = this.xC + this.r * Math.cos(this.aStart);
 					double x2 = this.xC + this.r * Math.cos(this.aEnd);
 					XRange tempRange = new XRange(Math.min(x1,x2), Math.max(x1,x2));
-					if (BumpMapping.isInsideAngleRange(aStart, aEnd,       0)) tempRange = tempRange.add(this.xC + this.r);
-					if (BumpMapping.isInsideAngleRange(aStart, aEnd, Math.PI)) tempRange = tempRange.add(this.xC - this.r);
+					if (Math2.isInsideAngleRange(aStart, aEnd, 0.0    )) tempRange = tempRange.add(this.xC + this.r);
+					if (Math2.isInsideAngleRange(aStart, aEnd, Math.PI)) tempRange = tempRange.add(this.xC - this.r);
 					this.range = tempRange;
 				}
 				@Override public void addTo(ProfileXYbasedLineElement.LineGroup lineGroup, double x, double y, double scale) { lineGroup.addArc(x+xC*scale, y+yC*scale, r*scale, aStart, aEnd); }
@@ -769,7 +770,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			final double minW,maxW,minR,maxR;
 			
 			private Bounds() {
-				this(0,BumpMapping.FULL_CIRCLE,0,Double.POSITIVE_INFINITY);
+				this(0,Math2.FULL_CIRCLE,0,Double.POSITIVE_INFINITY);
 			}
 			private Bounds(double minW, double maxW, double minR, double maxR) {
 				this.minW = minW;
@@ -787,7 +788,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			public boolean isInside(double w, double r) {
 				if (r<minR) return false;
 				if (r>maxR) return false;
-				return BumpMapping.isInsideAngleRange(minW, maxW, w);
+				return Math2.isInsideAngleRange(minW, maxW, w);
 			}
 			public Bounds rotate(double w) {
 				return new Bounds(minW+w, maxW+w, minR, maxR);
@@ -833,7 +834,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			}
 			
 			protected <V> V convert(double w, double r, BiFunction<Double,Double,V> getCartValue) {
-				w = BumpMapping.normalizeAngle(zeroXAngle,w);
+				w = Math2.normalizeAngle(zeroXAngle, w);
 				double x = (w-zeroXAngle)*zeroYRadius;
 				double y = zeroYRadius-r;
 				return getCartValue.apply(x,y);
@@ -866,7 +867,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			
 			@Override
 			protected <V> V convert(double w, double r, BiFunction<Double,Double,V> getCartValue) {
-				w = BumpMapping.normalizeAngle(zeroXAngle,w);
+				w = Math2.normalizeAngle(zeroXAngle, w);
 				r = r-radiusOffset;
 				double rBase = zeroYRadius - (w-zeroXAngle)/2/Math.PI*rowHeight;
 				double i = Math.floor((rBase-r)/rowHeight);

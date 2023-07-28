@@ -293,24 +293,6 @@ public class BumpMapping {
 		}
 	}
 	
-	static final double FULL_CIRCLE = 2*Math.PI;
-
-	public static double normalizeAngle(double minW, double w) {
-		double wDiff = w-minW;
-		if (wDiff<0 || FULL_CIRCLE<wDiff) w -= Math.floor(wDiff/FULL_CIRCLE)*FULL_CIRCLE;
-		Debug.Assert(minW<=w);
-		Debug.Assert(w<=minW+FULL_CIRCLE);
-		return w;
-	}
-	public static boolean isInsideAngleRange(double minW, double maxW, double w) {
-		Debug.Assert(Double.isFinite(minW));
-		Debug.Assert(Double.isFinite(maxW));
-		Debug.Assert(minW<=maxW);
-		
-		w = normalizeAngle(minW,w);
-		return w<=maxW;
-	}
-	
 	public interface NormalFunctionBase {
 		public Normal getNormal(double x, double y, double width, double height);
 	}
