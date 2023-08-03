@@ -55,11 +55,20 @@ public class LinesIO
 	public static void writeForms(PrintWriter out, Form[] forms)
 	{
 		for (Form form : forms)
-		{
-			double[] values = form.getValues();
-			String valuesStr = String.join(";", Arrays.stream(values).mapToObj(d->Double.toString(d)).toArray(String[]::new));
-			out.printf("%s=%s%n", getName(form), valuesStr);
-		}
+			writeForm(out, form);
+	}
+
+	public static void writeForms(PrintWriter out, Iterable<? extends Form> forms)
+	{
+		for (Form form : forms)
+			writeForm(out, form);
+	}
+
+	private static void writeForm(PrintWriter out, Form form)
+	{
+		double[] values = form.getValues();
+		String valuesStr = String.join(";", Arrays.stream(values).mapToObj(d->Double.toString(d)).toArray(String[]::new));
+		out.printf("%s=%s%n", getName(form), valuesStr);
 	}
 
 	private static String getName(Form form)
