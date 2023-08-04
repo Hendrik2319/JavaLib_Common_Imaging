@@ -1,6 +1,8 @@
 package net.schwarzbaer.java.lib.image.linegeometry;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -12,6 +14,7 @@ public interface Form {
 	
 	double[] getValues();
 	Form setValues(double[] values);
+	Rectangle2D.Double computeBoundingBox();
 	
 	public interface Factory {
 		PolyLine createPolyLine(double[] values);
@@ -29,6 +32,17 @@ public interface Form {
 		public int size() { return points.size(); }
 		public double getFirstX() { return points.get(0).x; }
 		public double getFirstY() { return points.get(0).y; }
+		
+		@Override public Double computeBoundingBox()
+		{
+			Rectangle2D.Double bb = null;
+			for (Point p : points)
+				if (bb==null)
+					bb = new Rectangle2D.Double(p.x,p.y,0,0);
+				else
+					bb.add(p.x,p.y);
+			return bb;
+		}
 		
 		public PolyLine add(double x, double y) {
 			points.add(new Point(x,y));
@@ -83,6 +97,13 @@ public interface Form {
 			return this;
 		}
 		
+		@Override public Double computeBoundingBox()
+		{
+			Rectangle2D.Double bb = new Rectangle2D.Double(x1,y1,0,0);
+			bb.add(x2,y2);
+			return bb;
+		}
+		
 		public PolyLine.Point computePoint(double f) {
 			return new PolyLine.Point( x1*(1-f)+x2*f, y1*(1-f)+y2*f );
 		}
@@ -128,6 +149,24 @@ public interface Form {
 			this.aStart = values[3];
 			this.aEnd   = values[4];
 			return this;
+		}
+		
+		@Override public Double computeBoundingBox()
+		{
+			double xS = xC+r*Math.cos(aStart);
+			double yS = yC+r*Math.sin(aStart);
+			double xE = xC+r*Math.cos(aEnd);
+			double yE = yC+r*Math.sin(aEnd);
+			
+			Rectangle2D.Double bb = new Rectangle2D.Double(xS,yS,0,0);
+			bb.add(xE,yE);
+			
+			if (Math2.isInsideAngleRange(aStart, aEnd,  0.0      )) bb.add(xC+r,yC  );
+			if (Math2.isInsideAngleRange(aStart, aEnd,  Math.PI  )) bb.add(xC-r,yC  );
+			if (Math2.isInsideAngleRange(aStart, aEnd,  Math.PI/2)) bb.add(xC  ,yC+r);
+			if (Math2.isInsideAngleRange(aStart, aEnd, -Math.PI/2)) bb.add(xC  ,yC-r);
+			
+			return bb;
 		}
 	}
 }
