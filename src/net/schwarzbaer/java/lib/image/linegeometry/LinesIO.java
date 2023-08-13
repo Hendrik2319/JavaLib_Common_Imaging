@@ -2,7 +2,10 @@ package net.schwarzbaer.java.lib.image.linegeometry;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import net.schwarzbaer.java.lib.image.linegeometry.Form.Factory;
 
@@ -52,23 +55,45 @@ public class LinesIO
 		return values;
 	}
 
-	public static void writeForms(PrintWriter out, Form[] forms)
+	public static void writeForms(PrintWriter out, Form[] forms) { writeForms(out, forms, null); }
+	public static void writeForms(PrintWriter out, Form[] forms, Consumer<String> addError)
 	{
-		for (Form form : forms)
-			writeForm(out, form);
+		writeForms(out, forms, ()->forms.length, i->forms[i], addError);
 	}
 
-	public static void writeForms(PrintWriter out, Iterable<? extends Form> forms)
+	public static void writeForms(PrintWriter out, List<? extends Form> forms) { writeForms(out, forms, null); }
+	public static void writeForms(PrintWriter out, List<? extends Form> forms, Consumer<String> addError)
 	{
-		for (Form form : forms)
-			writeForm(out, form);
+		writeForms(out, forms, forms::size, forms::get, addError);
 	}
-
-	private static void writeForm(PrintWriter out, Form form)
+	
+	private static void writeForms(PrintWriter out, Object formsList, Supplier<Integer> getSize, Function<Integer,Form> getForm, Consumer<String> addError)
 	{
-		double[] values = form.getValues();
-		String valuesStr = String.join(";", Arrays.stream(values).mapToObj(d->Double.toString(d)).toArray(String[]::new));
-		out.printf("%s=%s%n", getName(form), valuesStr);
+		if (formsList==null)
+		{
+			if (addError!=null) addError.accept("LinesIO.writeForms: Given list of forms is null.");
+			return;
+		}
+		
+		for (int i=0; i<getSize.get(); i++)
+		{
+			Form form = getForm.apply(i);
+			if (form==null)
+			{
+				if (addError!=null) addError.accept(String.format("LinesIO.writeForms: Form[%d] is null.", i));
+				continue;
+			}
+			
+			double[] values = form.getValues();
+			if (values==null)
+			{
+				if (addError!=null) addError.accept(String.format("LinesIO.writeForms: Form[%d].Values is null.", i));
+				continue;
+			}
+			
+			String valuesStr = String.join(";", Arrays.stream(values).mapToObj(d->Double.toString(d)).toArray(String[]::new));
+			out.printf("%s=%s%n", getName(form), valuesStr);
+		}
 	}
 
 	private static String getName(Form form)
