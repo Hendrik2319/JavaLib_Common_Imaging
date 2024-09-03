@@ -15,7 +15,7 @@ public class ImageSimilarity<ImageID> {
 	}
 	
 	public static <ImageID> int[] computeOrder(ImageID baseImageID, ImageID[] imageIDs, RasterSource<ImageID> rasterSource) {
-		return new ImageSimilarity<ImageID>(rasterSource).computeOrder(baseImageID, imageIDs);
+		return new ImageSimilarity<>(rasterSource).computeOrder(baseImageID, imageIDs);
 	}
 	
 	public int[] computeOrder(ImageID baseImageID, ImageID[] imageIDs) {

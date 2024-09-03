@@ -71,7 +71,7 @@ public class AlphaCharIO {
 	}
 
 	public static HashMap<Character, Form[]> readAlphaCharFontFromStream(InputStream stream, Form.Factory formFactory) {
-		HashMap<Character, Form[]> alphabet = new HashMap<Character,Form[]>();
+		HashMap<Character, Form[]> alphabet = new HashMap<>();
 		LinesIO linesIO = new LinesIO(formFactory);
 		
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
