@@ -58,6 +58,7 @@ public interface Form {
 			}
 			return values;
 		}
+		@SuppressWarnings("null")
 		@Override public PolyLine setValues(double[] values) {
 			Assert(values!=null);
 			Assert((values.length&1)==0);

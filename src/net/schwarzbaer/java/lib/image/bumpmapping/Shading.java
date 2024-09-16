@@ -39,6 +39,7 @@ public abstract class Shading {
 		private final Shading[] shadings;
 		private Indexer indexer;
 		
+		@SuppressWarnings("null")
 		public MixedShading(Indexer indexer, Shading...shadings) {
 			super(new Normal(0,0,1));
 			this.indexer = indexer;

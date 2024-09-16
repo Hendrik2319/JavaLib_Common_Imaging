@@ -125,6 +125,7 @@ public abstract class ProfileXY {
 	
 	public static class Group extends ProfileXY {
 
+		@SuppressWarnings("null")
 		private static double getR(ProfileXY[] children, BiFunction<Double,Double,Double> compare) {
 			Debug.Assert(children!=null);
 			Debug.Assert(children.length>0);
@@ -154,6 +155,7 @@ public abstract class ProfileXY {
 			setGroup(children);
 		}
 		
+		@SuppressWarnings("null")
 		public void setGroup(ProfileXY... children) {
 			Debug.Assert(children!=null);
 			for (ProfileXY child:children)

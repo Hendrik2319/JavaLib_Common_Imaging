@@ -245,6 +245,7 @@ public class BumpMapping {
 			);
 		}
 		
+		@SuppressWarnings("null")
 		private int[] div(int[] color, int divisor) {
 			Debug.Assert(color!=null);
 			for (int i=0; i<color.length; i++)
@@ -252,6 +253,7 @@ public class BumpMapping {
 			return color;
 		}
 		
+		@SuppressWarnings("null")
 		private int[] add(int[] sumColor, int[] color) {
 			Debug.Assert(color!=null);
 			Debug.Assert(color.length>0);
