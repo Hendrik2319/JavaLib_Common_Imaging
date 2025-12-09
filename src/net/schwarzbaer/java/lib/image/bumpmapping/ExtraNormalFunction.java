@@ -799,17 +799,23 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			
 			protected double zeroYRadius;
 			protected double zeroXAngle;
+			protected double scaleXAngle;
 			protected final Cart extra;
 
 			public BentCartExtra(double zeroYRadius, double zeroXAngle, Cart extra) {
+				this(zeroYRadius, zeroXAngle, 1, extra);
+			}
+			public BentCartExtra(double zeroYRadius, double zeroXAngle, double scaleXAngle, Cart extra) {
 				setZeroYRadius(zeroYRadius);
-				setZeroXAngle(zeroXAngle);
+				setZeroXAngle (zeroXAngle );
+				setScaleXAngle(scaleXAngle);
 				this.extra = extra;
 				Debug.Assert(this.extra!=null);
 			}
 
 			public double getZeroYRadius() { return zeroYRadius; }
 			public double getZeroXAngle () { return zeroXAngle ; }
+			public double getScaleXAngle() { return scaleXAngle; }
 			
 			public void setZeroYRadius(double zeroYRadius) {
 				this.zeroYRadius = zeroYRadius;
@@ -819,6 +825,11 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			public void setZeroXAngle(double zeroXAngle) {
 				this.zeroXAngle  = zeroXAngle ;
 				Debug.Assert(Double.isFinite(this.zeroXAngle));
+			}
+			public void setScaleXAngle(double scaleXAngle) {
+				this.scaleXAngle = scaleXAngle;
+				Debug.Assert(Double.isFinite(this.scaleXAngle));
+				Debug.Assert(this.scaleXAngle!=0);
 			}
 
 			@Override
@@ -835,7 +846,7 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			
 			protected <V> V convert(double w, double r, BiFunction<Double,Double,V> getCartValue) {
 				w = Math2.normalizeAngle(zeroXAngle, w);
-				double x = (w-zeroXAngle)*zeroYRadius;
+				double x = (w-zeroXAngle)/scaleXAngle*zeroYRadius;
 				double y = zeroYRadius-r;
 				return getCartValue.apply(x,y);
 			}
@@ -848,7 +859,10 @@ public interface ExtraNormalFunction extends NormalFunctionBase {
 			private double radiusOffset;
 
 			public SpiralBentCartExtra(double zeroYRadius, double zeroXAngle, double rowHeight, double radiusOffset, Cart extra) {
-				super(zeroYRadius, zeroXAngle, extra);
+				this(zeroYRadius, zeroXAngle, 1, rowHeight, radiusOffset, extra);
+			}
+			public SpiralBentCartExtra(double zeroYRadius, double zeroXAngle, double scaleXAngle, double rowHeight, double radiusOffset, Cart extra) {
+				super(zeroYRadius, zeroXAngle, scaleXAngle, extra);
 				setRowHeight(rowHeight);
 			}
 			
